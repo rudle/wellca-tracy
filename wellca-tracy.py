@@ -6,42 +6,23 @@ from waveapi import model
 from waveapi import robot
 import cgi
 
-
 def OnRobotAdded(properties, context):
   root_wavelet = context.GetRootWavelet()
-  root_wavelet.CreateBlip().GetDocument().SetText("REMEMBER ME")
-
-class MainPage(webapp.RequestHandler):
-  def get(self):
-    self.response.out.write("""
-          <html>
-            <body>
-              <form action="/sign" method="post">
-                <div><textarea name="content" rows="3" cols="60"></textarea></div>
-                <div><input type="submit" value="Sign Guestbook"></div>
-              </form>
-            </body>
-          </html>""")
-
-
-  def post(self):
-    self.response.out.write('<html><body>You wrote:<pre>')
-    self.response.out.write(cgi.escape(self.request.get('content')))
-    self.response.out.write('</pre></body></html>')
-
-application = webapp.WSGIApplication( [('/.*', MainPage)],
-                                      debug=True)
+  root_wavelet.CreateBlip().GetDocument().SetText("Hey now!")
 
 def main():
+  myRobot = robot.Robot('wellca-tracy',
+      image_url='http://wellca-tracy.appspot.com/icon.png', 
+      version=1,
+      profile_url='http://wellca-tracy.appspot.com/')
   myRobot.RegisterHandler(events.WAVELET_SELF_ADDED, OnRobotAdded)
-  run_wsgi_app(application)
+  myRobot.Run()
 
 if __name__ == "__main__":
   main()
 
 
 def mail(message):
-
   message = mail.EmailMessage(sender="Example <seansorrell@gmail.com>",
                             subject="Your account has been approved")
 
