@@ -1,8 +1,8 @@
-application: well-tracy
+application: wellca-tracy
 version: 1
 runtime: python
 api_version: 1
 
 handlers:
 - url: /.*
-  script: well-tracy.py
+  script: wellca-tracy.py
