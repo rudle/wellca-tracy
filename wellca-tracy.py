@@ -5,6 +5,7 @@ from waveapi import events
 from waveapi import model
 from waveapi import robot
 import cgi
+import re
 
 def OnRobotAdded(properties, context):
   root_wavelet = context.GetRootWavelet()
@@ -17,7 +18,31 @@ def OnBlipSubmitted(properties, context):
 
   if blip:
     doc = blip.GetDocument() # OpBasedDocument
-    doc.AppendText("  oh yeah? do go on....")
+
+    ticketRe = re.compile('(?:.*?)#([0-9]+)*')
+    revRe = re.compile('(?:.*?)r([0-9]+)*')
+
+    text = doc.GetText()
+    while (True):
+      ticketMatch = ticketRe.match(text)
+
+      if ticketMatch:
+        ticketId = ticketMatch.group(1)
+        doc.AppendText("\n\nhttp://wellington.well.lan/trac/ticket/" + ticketId)
+        text = text.lstrip(ticketMatch.group(0))
+      else:
+        break;
+
+    text = doc.GetText()
+    while (True):
+      revMatch = revRe.match(text)
+      if revMatch:
+        revId = revMatch.group(1)
+        doc.AppendText("\n\nhttp://wellington.well.lan/trac/changeset/" + revId)
+        text = text.lstrip(revMatch.group(0))
+      else:
+        break;
+
   else:
     root_wavelet = context.GetRootWavelet()
     root_wavelet.CreateBlip().GetDocument().SetText("No blip found :(")
