@@ -1,6 +1,7 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 import cgi
+from google.appengine.api import mail
 
 class MainPage(webapp.RequestHandler):
   def get(self):
@@ -28,3 +29,14 @@ def main():
 
 if __name__ == "__main__":
   main()
+
+
+def mail(message):
+
+  message = mail.EmailMessage(sender="Example <seansorrell@gmail.com>",
+                            subject="Your account has been approved")
+
+  message.to = "Sean <seansorrell@gmail.com>"
+  message.body = message
+
+  message.send
