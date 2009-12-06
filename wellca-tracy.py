@@ -5,12 +5,13 @@ from waveapi import events
 from waveapi import model
 from waveapi import robot
 import cgi
+import urllib
 import re
 
-def well_send_mail(message):
-  message = mail.EmailMessage(sender="Example <seansorrell@gmail.com>", subject="Your account has been approved")
-  message.to = "Sean <seansorrell@gmail.com>"
-  message.body = message
+def well_send_mail(message_text):
+  message = mail.EmailMessage(sender="From Wave <seansorrell@gmail.com>", subject="Bug filed from Wave")
+  message.to = "Noone <email@example.com>"
+  message.body = message_text
   message.send()
 
 
@@ -28,24 +29,24 @@ def OnBlipSubmitted(properties, context):
 
     ticketRe = re.compile('(?:.*?)#([0-9]+)*')
     revRe = re.compile('(?:.*?)r([0-9]+)*')
-    mailRe = mailRe = re.compile('(?:.*?)mail\:\<(.*)\>')
+    mailRe = re.compile('(?:.*?)mail\:\<(.*)\>', re.DOTALL)
 
     text = doc.GetText()
 
     newText = re.sub('#([0-9]+)', r'ticket \1 : http://wellington.well.lan/trac/ticket/\1' , text)
     newText = re.sub('r([0-9]+)', r'rev \1 : http://wellington.well.lan/trac/changeset/\1' , newText) # I acknowledge that this is gross
 
+    while (True):
+      mailMatch = mailRe.match(newText)
+      if mailMatch:
+        message_text = mailMatch.group(1)
+        well_send_mail(message_text)
+        newText = re.sub('mail\:\<(.*)\>', r'bug filed: http://wellington.well.lan/trac/search?q=' + urllib.quote(message_text), newText)
+      else:
+        break;
+
     if newText != text:
       doc.SetText(newText)
-
-    #text = doc.GetText()
-    #while (True):
-      #mailMatch = mailRe.match(text)
-      #if mailMatch:
-        #message = mailMatch.group(1)[0]
-        #well_send_mail(message)
-      #else:
-        #break;
 
   else:
     root_wavelet = context.GetRootWavelet()
