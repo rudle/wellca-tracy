@@ -7,12 +7,12 @@ from waveapi import robot
 import cgi
 import re
 
-
 def well_send_mail(message):
   message = mail.EmailMessage(sender="Example <seansorrell@gmail.com>", subject="Your account has been approved")
   message.to = "Sean <seansorrell@gmail.com>"
   message.body = message
   message.send()
+
 
 def OnRobotAdded(properties, context):
   root_wavelet = context.GetRootWavelet()
@@ -32,10 +32,11 @@ def OnBlipSubmitted(properties, context):
 
     text = doc.GetText()
 
-    text = re.sub('#([0-9]+)', r'ticket \1 : http://wellington.well.lan/trac/ticket/\1' , text)
-    text = re.sub('r([0-9]+)', r'rev \1 : http://wellington.well.lan/trac/changeset/\1' , text)
+    newText = re.sub('#([0-9]+)', r'ticket \1 : http://wellington.well.lan/trac/ticket/\1' , text)
+    newText = re.sub('r([0-9]+)', r'rev \1 : http://wellington.well.lan/trac/changeset/\1' , newText) # I acknowledge that this is gross
 
-    doc.SetText(text)
+    if newText != text:
+      doc.SetText(newText)
 
     #text = doc.GetText()
     #while (True):
