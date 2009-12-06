@@ -7,6 +7,13 @@ from waveapi import robot
 import cgi
 import re
 
+
+def well_send_mail(message):
+  message = mail.EmailMessage(sender="Example <seansorrell@gmail.com>", subject="Your account has been approved")
+  message.to = "Sean <seansorrell@gmail.com>"
+  message.body = message
+  message.send()
+
 def OnRobotAdded(properties, context):
   root_wavelet = context.GetRootWavelet()
   root_wavelet.CreateBlip().GetDocument().SetText("Hey now!")
@@ -21,27 +28,23 @@ def OnBlipSubmitted(properties, context):
 
     ticketRe = re.compile('(?:.*?)#([0-9]+)*')
     revRe = re.compile('(?:.*?)r([0-9]+)*')
+    mailRe = mailRe = re.compile('(?:.*?)mail\:\<(.*)\>')
 
     text = doc.GetText()
-    while (True):
-      ticketMatch = ticketRe.match(text)
 
-      if ticketMatch:
-        ticketId = ticketMatch.group(1)
-        doc.AppendText("\n\nhttp://wellington.well.lan/trac/ticket/" + ticketId)
-        text = text.lstrip(ticketMatch.group(0))
-      else:
-        break;
+    text = re.sub('#([0-9]+)', r'ticket \1 : http://wellington.well.lan/trac/ticket/\1' , text)
+    text = re.sub('r([0-9]+)', r'rev \1 : http://wellington.well.lan/trac/changeset/\1' , text)
 
-    text = doc.GetText()
-    while (True):
-      revMatch = revRe.match(text)
-      if revMatch:
-        revId = revMatch.group(1)
-        doc.AppendText("\n\nhttp://wellington.well.lan/trac/changeset/" + revId)
-        text = text.lstrip(revMatch.group(0))
-      else:
-        break;
+    doc.SetText(text)
+
+    #text = doc.GetText()
+    #while (True):
+      #mailMatch = mailRe.match(text)
+      #if mailMatch:
+        #message = mailMatch.group(1)[0]
+        #well_send_mail(message)
+      #else:
+        #break;
 
   else:
     root_wavelet = context.GetRootWavelet()
@@ -62,11 +65,3 @@ if __name__ == "__main__":
   main()
 
 
-def mail(message):
-  message = mail.EmailMessage(sender="Example <seansorrell@gmail.com>",
-                            subject="Your account has been approved")
-
-  message.to = "Sean <seansorrell@gmail.com>"
-  message.body = message
-
-  message.send
